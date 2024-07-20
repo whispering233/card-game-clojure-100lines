@@ -5,18 +5,19 @@
 (def suit ["♣" "♠" "♦" "♥"])
 (def rank ["2" "3" "4" "5" "6" "7" "8" "9" "10" "J" "Q" "K" "A"])
 (defn get-deck [] (shuffle (vec (for [a suit b rank] (str a b)))))
-(defn deal-hands [shuffle-deck ro-seat]
-  (interleave
-    (apply concat (repeat 2 (partition 2 (interleave ro-seat player))))
-    (partition 2 (take (* 2 (count player)) shuffle-deck))))
+(defn deal-hands [shuffle-deck]
+  (apply hash-map (interleave seat
+                              (partition 2 (take (* 2 (count player)) shuffle-deck)))))
 (defn deal-public [shuffle-deck] (take 5 (drop (* 2 (count player)) shuffle-deck)))
-(defn start []
-  (let [deck (get-deck) hands (deal-hands deck seat) public (deal-public deck)]
-    (println "Mine hands is " (nth hands (+ 1 (* 2 (.indexOf player "Mine")))))
-    (println "Public " public)))
-
-
-(defn handle-input []
-  (println "Please enter something:")
-  (let [input (read-line)]
-    (println "You entered:" input)))
+(defn bind-player [ro-seat] (apply hash-map (interleave ro-seat player)))
+(defn rotate-seat [seat] (concat (take-last 1 seat) (drop-last 1 seat)))
+(defn start [deck ro-seat]
+  (let [seat-player (bind-player ro-seat)
+        hands (deal-hands deck)
+        public (deal-public deck)]
+    (doseq [speaker seat] (println speaker (seat-player speaker) (hands speaker)))
+    (println public))
+  (let [continue (read-line)]
+    (if (and continue (not= "exit" continue))
+      (start (get-deck) (rotate-seat ro-seat))
+      (println "EXIT GAME"))))
