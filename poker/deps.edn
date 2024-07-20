@@ -1,0 +1,8 @@
+{:deps
+ {org.openjfx/javafx-controls {:mvn/version "17.0.1"}
+  org.openjfx/javafx-fxml {:mvn/version "17.0.1"}
+  org.openjfx/javafx-web {:mvn/version "17.0.1"}}
+
+ :aliases
+ {:run
+  {:main-opts ["-m" "my.javafx-app"]}}}
